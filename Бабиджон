@@ -1,0 +1,154 @@
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QVBoxLayout, QRadioButton, QGroupBox, QButtonGroup, QHBoxLayout
+from random import shuffle
+from random import randint
+
+app = QApplication([])
+win = QWidget()
+win.setWindowTitle('MemoryCard')
+win.resize(350, 300)
+
+class Question():
+    def __init__(self, question, right_answer, wrong1, wrong2, wrong3):
+        self.question = question
+        self.right_answer = right_answer
+        self.wrong1 = wrong1
+        self.wrong2 = wrong2
+        self.wrong3 = wrong3
+
+questions = []
+questions.append(Question('Какой сейчас год?', '2022', '2007', '2001', '2035'))
+questions.append(Question('1 + 1 ?', '2', '0', '325', '-50'))
+questions.append(Question('Кто такой вопрос?', 'Салатик, Салотик бидешь?', 'А что текое люблёв?', 'вопросыыы', 'Какой тебе лет?'))
+questions.append(Question('Что такое H', 'водород', 'азот', 'буква', 'аш'))
+
+
+lbl = QLabel('Вопрос')
+
+button_group = QButtonGroup()
+otv1 = QRadioButton('otvet 1')
+otv2 = QRadioButton('otvet 2')
+otv3 = QRadioButton('otvet 3')
+otv4 = QRadioButton('otvet 4')
+button_group.addButton(otv1)
+button_group.addButton(otv2)
+button_group.addButton(otv3)
+button_group.addButton(otv4)
+
+qus1 = QVBoxLayout()
+qus2 = QVBoxLayout()
+qus1.addWidget(otv1, alignment=Qt.AlignCenter)
+qus1.addWidget(otv2, alignment=Qt.AlignCenter)
+qus2.addWidget(otv3, alignment=Qt.AlignCenter)
+qus2.addWidget(otv4, alignment=Qt.AlignCenter)
+qus1.setSpacing(30)
+qus2.setSpacing(30)
+h1 = QHBoxLayout()
+h1.addLayout(qus1)
+h1.addLayout(qus2)
+h1.setSpacing(50)
+group = QGroupBox('Варианты ответофф:')
+group.setLayout(h1)
+
+
+lbl_otv1 = QLabel('Правильно/Неправильно')
+lbl_otv2 = QLabel('Правильный ответ!')
+h1_otv = QHBoxLayout()
+h2_otv = QHBoxLayout()
+h1_otv.addWidget(lbl_otv1, alignment=Qt.AlignLeft)
+h2_otv.addWidget(lbl_otv2, alignment=Qt.AlignCenter)
+qus1_otv = QVBoxLayout()
+qus1_otv.addLayout(h1_otv)
+qus1_otv.addLayout(h2_otv)
+qus1_otv.setSpacing(40)
+group_otv = QGroupBox('Результаты теста:')
+group_otv.setLayout(qus1_otv)
+group_otv.hide()
+
+btn = QPushButton('Ответить')
+
+qus_itog = QVBoxLayout()
+
+qus_itog.addWidget(lbl, alignment=Qt.AlignCenter)
+qus_itog.addWidget(group)
+qus_itog.addWidget(group_otv)
+qus_itog.addWidget(btn)
+qus_itog.setSpacing(50)
+win.setLayout(qus_itog)
+
+answer = [otv1, otv2, otv3, otv4]
+
+def ask(q: Question):
+    shuffle(answer)
+    answer[0].setText(q.right_answer)
+    answer[1].setText(q.wrong1)
+    answer[2].setText(q.wrong2)
+    answer[3].setText(q.wrong3)
+    lbl.setText(q.question)
+    lbl_otv2.setText(q.right_answer)
+    group.show()
+
+def check_answer():
+    if answer[0].isChecked():
+        lbl_otv1.setText('Правильно!')
+        show_result()
+    else:
+        lbl_otv1.setText('Неправильно!')
+        show_result()
+        if cur_question == Правильно:
+            score += 1
+
+def show_result():
+    group.hide()
+    group_otv.show()
+    btn.setText('Следующий вопрос')
+
+def show_questions():
+    group_otv.hide()
+    group.show()
+    btn.setText('Ответить')
+    button_group.setExclusive(False)
+    otv1.setChecked(False)
+    otv2.setChecked(False)
+    otv3.setChecked(False)
+    otv4.setChecked(False)
+    button_group.setExclusive(True)
+
+def start_test():
+    if btn.text() == 'Ответить':
+        check_answer()
+    else:
+        next_question()
+
+def next_question():
+    win.cur_question += 1
+    if win.cur_question >= len(questions):
+        vyvod = str(win.prav) + 'из' + str(len(questions)) + ' Процент правильных ответов:' + str(win.prav / len(questions) * 100) + '%'
+        lbl.setText('Тест пройден!')
+        lbl_otv1.hide()
+        lbl_otv2.setText(vyvod)
+        show_result()
+        btn.hide()
+    else:
+        while True:
+            if questions[win.vopros] in voprosy:
+                win.vopros = randint(0, len(questions)-1)
+            else:
+                ask(questions[win.vopros])
+                voprosy.append(questions[win.vopros])
+                break
+            show_questions()
+
+
+btn.clicked.connect(start_test)
+
+win.cur_question = -1
+win.vopros = randint(0, len(questions)-1)
+voprosy = []
+next_question()
+
+
+win.prav = 0
+
+win.show()
+app.exec_()
